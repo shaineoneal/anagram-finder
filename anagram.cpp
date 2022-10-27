@@ -1,17 +1,16 @@
 /*
- * Name:
- * Date Submitted:
- * Assignment Name:
+ * Name: Shaine O'Neal
+ * Date Submitted: 10/27/2022
+ * Assignment Name: Single Word Anagram Finder
  */
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include <array>
 
 using namespace std;
-
-static int counter = 0;
 
 vector<string> loadWordlist(string filename);
 
@@ -25,25 +24,28 @@ vector<string> loadWordlist(string filename);
 */
 vector<string> anagram(string word, vector<string> wordlist);
 
-//hash function based on word size
-size_t hash_size(const string word) {
-    return word.size();
-}
+struct Alphabet {
+        array<int, 26> alpha = {0};
+    public:
+        Alphabet() = default;
+        Alphabet(string word) {
+            for(int i = 0; i < word.size(); i++) {
+                pushLetter(word.at(i));
+            }
+        }
+        void pushLetter(int letter) {
+            letter -= 97; 
+            alpha[letter]++;
+        }
+        array<int, 26> final() {return alpha; }
+        
+};
 
-char hash_letter(const string word) {
-    return word[0];
-}
-
-//find sum of ASCII codes for all letters in word
-int findVal(string word) {
-    int wordVal = 0;
-
-    for(int i = 0; i < word.size(); i++) {
-        wordVal += word[i];
-    }
-    return wordVal;
-}
-
+struct alphabetHash {
+    size_t operator()(const Alphabet &a) const{
+            return ;
+        }
+};
 
 int main()
 {
@@ -82,7 +84,7 @@ vector<string> loadWordlist(string filename)
 }
 
 //Implement this function
-vector<string> anagram(string word, vector<string> wordlist) {
+/*vector<string> anagram(string word, vector<string> wordlist) {
 
     vector<string> anagrams;
 
@@ -110,4 +112,41 @@ vector<string> anagram(string word, vector<string> wordlist) {
         }
     }
     return anagrams;
+}*/
+
+vector<string> anagram(string word, vector<string> wordlist) {
+    
+    //create freq map for word
+    Alphabet wordFreq(word);
+    //create unordered_map
+    unordered_map<array<int, 26>, vector<string>, Alphabet> miniDict;
+
+    //iterate thru wordlist
+    for(int i = 0; i < wordlist.size(); i++) {
+        
+        //if wordlist.word is the same size as word
+        if(wordlist.at(i).size() == word.size()){
+
+            //iterate thru letters in word
+            for(int j = 0; j < word.size(); j++){
+
+                //if first letter in wordlist.word is in word
+                if(word[j] == wordlist.at(i)[0]) { 
+                    //create freq list
+                    Alphabet freq(wordlist.at(i));
+
+                    //add word to miniDict
+                    miniDict[freq.final()].push_back(wordlist.at(i));
+                }
+            }
+        }
+        
+    }
+    return miniDict[wordFreq.final()];
+
+
+
+    //key = number of times each letter occurs in word
+    //value = vector<string> anagrams
+
 }
